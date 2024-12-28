@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./prisma.db"
+}
+
+model User {
+  id        String  @id @default(cuid())
+  username  String  @unique
+  email     String  @unique
+  password  String
+  avatarUrl String?
+
+  session Session[]
+  project Project[]
+}
+
+model Session {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  name        String
+  description String
+  document    String
+  status      String    @default("ON-QUEUE")
+  summary     String?
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+
+  chatHistory ChatHistory[]
+}
+
+model ChatHistory {
+  id       String @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+  role     String
+  message  String
+}
